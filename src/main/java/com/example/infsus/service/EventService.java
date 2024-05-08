@@ -1,13 +1,19 @@
 package com.example.infsus.service;
 
-import com.example.infsus.model.Event;
-import com.example.infsus.model.User;
+import com.example.infsus.helpers.EventSpecification;
+import com.example.infsus.model.*;
 import com.example.infsus.repository.EventRepository;
 import com.example.infsus.requests.EventRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -47,4 +53,71 @@ public class EventService {
         }
         throw new RuntimeException("User doesn't have permission to update this event");
     }
+
+    @Transactional
+    public ResponseEntity<String> joinEvent(String id) {
+        User user = userService.findUserByEmail();
+        Event event = getEventById(id);
+        if(event.isLocked()){
+            throw new RuntimeException("Event is locked");
+        }
+        if (event.getMaxPeople()< event.getCurrentPeople()){
+            if(event.getPlayersViaApp().contains(user)){
+                throw new RuntimeException("You can't join this event, you are already in this game");
+            }
+            EventPlayer eventPlayer= new EventPlayer(event, user);
+        }
+        else{
+            throw new RuntimeException("Event is full");
+        }
+        return new ResponseEntity<>("Joined Event", HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<String> lockEvent(String id) {
+        User user = userService.findUserByEmail();
+        Event event = getEventById(id);
+        if (event.getEventOwner().getId().equals(user.getId())) {
+            event.setLocked(true);
+        }else{
+            throw new RuntimeException("User doesn't have permission to lock this event");
+        }
+        return new ResponseEntity<>("Event locked", HttpStatus.OK);
+    }
+    @Transactional
+    public ResponseEntity<String> unlockEvent(String id) {
+        User user = userService.findUserByEmail();
+        Event event = getEventById(id);
+        if (event.getEventOwner().getId().equals(user.getId())) {
+            event.setLocked(false);
+        }else{
+        throw new RuntimeException("User doesn't have permission to lock this event");
+        }
+        return new ResponseEntity<>("Event unlocked", HttpStatus.OK);
+    }
+
+    @Transactional
+    public void deleteEvent(String id) {
+        User user = userService.findUserByEmail();
+        Event event = getEventById(id);
+        if (event.getEventOwner().getId().equals(user.getId())) {
+            eventRepository.delete(event);
+        }else{
+            throw new RuntimeException("User doesn't have permission to delete this event");
+        }
+    }
+
+    public Page<Event> filterEvents(String name, Location location, Sport sport, LocalDateTime startTime, Boolean myGames, Pageable pageable) {
+
+        User currentUser= userService.findUserByEmail();
+
+        Specification<Event> spec = EventSpecification.getEventsByCriteria(name, location, sport, startTime, myGames, currentUser);
+        return eventRepository.findAll(spec, pageable);
+    }
+
+    public List<Event> findEventsByOwnerOrPlayer(String userId) {
+        return eventRepository.findByEventOwner_IdOrPlayersViaApp_Id(userId, userId);
+    }
+
+
 }
