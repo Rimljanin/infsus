@@ -20,7 +20,7 @@ import java.util.List;
 @Entity
 public class Location extends IdSuperClass {
     private String name;
-    private String addres;
+    private String address;
     private String city;
 
 

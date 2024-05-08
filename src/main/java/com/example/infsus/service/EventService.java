@@ -32,6 +32,8 @@ public class EventService {
     @Transactional
     public Event createEvent(EventRequest eventRequest) {
         Event event = new Event(eventRequest);
+        User user=userService.findUserByEmail();
+        event.setEventOwner(user);
         return eventRepository.save(event);
     }
 

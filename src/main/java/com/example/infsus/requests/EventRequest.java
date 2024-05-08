@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Getter
 public class EventRequest {
     private String name;
-    private User eventOwner;
     private int maxPeople;
     private int currentPeople;
     private Location location;

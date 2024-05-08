@@ -19,19 +19,24 @@ import java.util.List;
 @Table(name = "event")
 public class Event extends IdSuperClass {
 
+    @Column(name = "name")
     private String name;
 
     @ManyToOne
     @JoinColumn(name = "eventowner_id")
     private User eventOwner;
 
+    @Column(name = "maxpeople")
     private int maxPeople;
 
+    @Column(name = "currentpeople")
     private int currentPeople;
 
     @ManyToOne
+    @JoinColumn(name = "location")
     private Location location;
 
+    @Column(name = "starttime")
     private LocalDateTime startTime;
 
     private boolean locked;
@@ -51,7 +56,6 @@ public class Event extends IdSuperClass {
 
     public Event(EventRequest eventRequest){
         this.name = eventRequest.getName();
-        this.eventOwner = eventRequest.getEventOwner();
         this.maxPeople = eventRequest.getMaxPeople();
         this.currentPeople = eventRequest.getCurrentPeople();
         this.location = eventRequest.getLocation();

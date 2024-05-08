@@ -23,6 +23,16 @@ public class UserService {
     @Transactional
     public User createUser(UserRequest userRequest){
         User user = new User(userRequest);
+        String email = null;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Jwt) {
+            Jwt jwtToken = (Jwt) authentication.getPrincipal();
+            email = jwtToken.getClaim("email");
+            user.setEmail(email);
+
+        } else {
+            throw new RuntimeException("Nedozvoljen pristup");
+        }
         return userRepository.save(user);
     }
 
