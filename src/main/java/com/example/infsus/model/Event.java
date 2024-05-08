@@ -1,6 +1,7 @@
 package com.example.infsus.model;
 
 import com.example.infsus.model.superclass.IdSuperClass;
+import com.example.infsus.requests.EventRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,4 +48,15 @@ public class Event extends IdSuperClass {
     )
     private List<User> playersViaApp;
 
+
+    public Event(EventRequest eventRequest){
+        this.name = eventRequest.getName();
+        this.eventOwner = eventRequest.getEventOwner();
+        this.maxPeople = eventRequest.getMaxPeople();
+        this.currentPeople = eventRequest.getCurrentPeople();
+        this.location = eventRequest.getLocation();
+        this.startTime = eventRequest.getStartTime();
+        this.locked = eventRequest.isLocked();
+        this.sport = eventRequest.getSport();
+    }
 }

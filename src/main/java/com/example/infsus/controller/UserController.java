@@ -1,15 +1,30 @@
 package com.example.infsus.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.infsus.model.User;
+import com.example.infsus.requests.UserRequest;
+import com.example.infsus.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("user")
 public class UserController {
 
-    @GetMapping("test")
-    public String test() {
-        return "test";
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("public/getProfile/{id}")
+    public User getProfile(@PathVariable String id) {
+        return userService.getUserById(id);
+    }
+
+    @PostMapping("createProfile")
+    public User createProfile(@RequestBody UserRequest userRequest) {
+        return userService.createUser(userRequest);
+    }
+
+    @PutMapping("updateProfile")
+    public User updateProfile(@RequestBody UserRequest userRequest) {
+        return userService.updateUser(userRequest);
     }
 }

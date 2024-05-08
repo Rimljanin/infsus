@@ -1,6 +1,7 @@
 package com.example.infsus.model;
 
 import com.example.infsus.model.superclass.IdSuperClass;
+import com.example.infsus.requests.UserRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,5 +35,12 @@ public class User extends IdSuperClass {
     @JsonIgnore
     @ManyToMany(mappedBy = "playersViaApp")
     private List<Event> eventsViaApp;
+
+
+    public User(UserRequest userRequest){
+        this.name = userRequest.getName();
+        this.lastName = userRequest.getLastName();
+        this.userName = userRequest.getUserName();
+    }
 
 }
