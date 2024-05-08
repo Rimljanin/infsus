@@ -1,28 +1,28 @@
 package com.example.infsus.model;
 
 import com.example.infsus.model.superclass.IdSuperClass;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="sport")
 @Entity
-public class Sport extends IdSuperClass {
-    private String name;
+@Table(name = "event_players_via_app")
+public class EventPlayer extends IdSuperClass {
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "sport")
-    private List<Event> events;
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    private Event event;
 
+    @ManyToOne
+    @JoinColumn(name = "player_id")
+    private User player;
 }
