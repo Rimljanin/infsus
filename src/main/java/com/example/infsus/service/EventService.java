@@ -2,6 +2,7 @@ package com.example.infsus.service;
 
 import com.example.infsus.helpers.EventSpecification;
 import com.example.infsus.model.*;
+import com.example.infsus.repository.EventPlayerRepository;
 import com.example.infsus.repository.EventRepository;
 import com.example.infsus.requests.EventRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class EventService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private EventPlayerRepository eventPlayerRepository;
 
     public Event getEventById(String id) {
         return eventRepository.findById(id).get();
@@ -60,17 +64,20 @@ public class EventService {
     public ResponseEntity<String> joinEvent(String id) {
         User user = userService.findUserByEmail();
         Event event = getEventById(id);
+
         if(event.isLocked()){
             throw new RuntimeException("Event is locked");
         }
-        if (event.getMaxPeople()< event.getCurrentPeople()){
+        if (event.getMaxPeople() > event.getCurrentPeople()){
             if(event.getPlayersViaApp().contains(user)){
-                throw new RuntimeException("You can't join this event, you are already in this game");
+                return new ResponseEntity<>("You can't join this event, you are already in this game", HttpStatus.OK);
             }
             EventPlayer eventPlayer= new EventPlayer(event, user);
+            eventPlayerRepository.save(eventPlayer);
+            event.setCurrentPeople(event.getCurrentPeople()+1);
         }
         else{
-            throw new RuntimeException("Event is full");
+            return new ResponseEntity<>("Event is full", HttpStatus.OK);
         }
         return new ResponseEntity<>("Joined Event", HttpStatus.OK);
     }

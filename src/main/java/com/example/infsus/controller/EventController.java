@@ -25,7 +25,7 @@ public class EventController {
     private EventService eventService;
 
 
-    @GetMapping("/events")
+    @GetMapping("filter")
     public Page<Event> getEvents(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Location location,
