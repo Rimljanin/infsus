@@ -46,7 +46,7 @@ public class UserService {
             User user = userRepository.findByEmail(email);
             if (user != null) {
                 user.setUserName(userRequest.getUserName());
-                user.setName(user.getName());
+                user.setName(userRequest.getName());
                 user.setLastName(userRequest.getLastName());
                 return user;
             } else {
