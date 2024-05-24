@@ -66,4 +66,8 @@ public class JwtTokenUtil {
     public String getEmailFromToken(String token) {
         return getClaimFromToken(token, claims -> claims.get("email", String.class));
     }
+    public boolean isTokenValid(String token) {
+        return !isTokenExpired(token);
+    }
+
 }

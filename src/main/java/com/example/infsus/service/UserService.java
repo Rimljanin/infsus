@@ -30,6 +30,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUserName(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
 
     @Transactional
     public User updateUser(UserRequest userRequest) {

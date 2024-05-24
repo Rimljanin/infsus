@@ -51,6 +51,15 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
+
+        if (userService.existsByUsername(registerRequest.getUserName()) && userService.existsByEmail(registerRequest.getEmail())) {
+            return ResponseEntity.badRequest().body("Korisničko ime i email već postoje");
+        } else if (userService.existsByUsername(registerRequest.getUserName())) {
+            return ResponseEntity.badRequest().body("Korisničko ime već postoji");
+        } else if (userService.existsByEmail(registerRequest.getEmail())) {
+            return ResponseEntity.badRequest().body("Email već postoji");
+        }
+
         User user = new User(registerRequest);
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         userService.save(user);
@@ -60,5 +69,12 @@ public class AuthController {
 
         return ResponseEntity.ok(new AuthResponse(jwt));
     }
+
+    @GetMapping("/validate-token/public")
+    public ResponseEntity<?> validateToken(@RequestParam String token) {
+        boolean isValid = jwtTokenUtil.isTokenValid(token);
+        return ResponseEntity.ok(isValid ? "Token is valid" : "Token is invalid or expired");
+    }
+
 }
 
