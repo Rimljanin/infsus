@@ -51,7 +51,7 @@ public class AuthController {
 
             return ResponseEntity.ok(new AuthResponse(jwt));
         } catch (BadCredentialsException e) {
-            throw new Exception("Invalid credentials");
+            throw new Exception("Nevažeći podatci za login");
         }
     }
 
