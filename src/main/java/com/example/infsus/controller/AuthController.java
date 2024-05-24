@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -72,9 +73,15 @@ public class AuthController {
 
     @GetMapping("/validate-token/public")
     public ResponseEntity<?> validateToken(@RequestParam String token) {
-        boolean isValid = jwtTokenUtil.isTokenValid(token);
-        return ResponseEntity.ok(isValid ? "Token is valid" : "Token is invalid or expired");
+        try {
+            boolean isValid = jwtTokenUtil.isTokenValid(token);
+            if (!isValid) {
+                throw new AuthenticationException("Token is invalid or expired") {};
+            }
+            return ResponseEntity.ok("Token is valid");
+        } catch (Exception e) {
+            throw new AuthenticationException("An internal server error occurred: " + e.getMessage()) {};
+        }
     }
-
 }
 
