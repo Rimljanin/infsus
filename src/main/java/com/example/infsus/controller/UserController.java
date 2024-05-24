@@ -18,11 +18,6 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @PostMapping("createProfile")
-    public User createProfile(@RequestBody UserRequest userRequest) {
-        return userService.createUser(userRequest);
-    }
-
     @PutMapping("updateProfile")
     public User updateProfile(@RequestBody UserRequest userRequest) {
         return userService.updateUser(userRequest);

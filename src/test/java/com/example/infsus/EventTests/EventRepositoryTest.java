@@ -1,5 +1,6 @@
 package com.example.infsus.EventTests;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -7,19 +8,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.example.infsus.model.Event;
 import com.example.infsus.model.User;
 import com.example.infsus.repository.EventRepository;
+import com.example.infsus.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class EventRepositoryTest {
 
     @Mock
     private EventRepository eventRepository;
+
+    @Mock
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Mock
+    private UserDetailsService userDetailsService;
 
     private User eventOwner;
     private User player;
@@ -32,9 +44,13 @@ public class EventRepositoryTest {
 
         eventOwner = new User();
         eventOwner.setId("ownerId");
+        eventOwner.setUserName("eventOwner");
+        eventOwner.setPassword("password");
 
         player = new User();
         player.setId("playerId");
+        player.setUserName("player");
+        player.setPassword("password");
 
         event1 = new Event();
         event1.setId("eventId1");
@@ -54,6 +70,22 @@ public class EventRepositoryTest {
         event2.setStartTime(LocalDateTime.now());
         event2.setLocked(true);
         event2.setPlayersViaApp(Arrays.asList(player));
+
+        when(jwtTokenUtil.generateToken(any(UserDetails.class))).thenAnswer(invocation -> {
+            UserDetails userDetails = invocation.getArgument(0);
+            return "mockedTokenForUser_" + userDetails.getUsername();
+        });
+
+        when(userDetailsService.loadUserByUsername(anyString())).thenAnswer(invocation -> {
+            String username = invocation.getArgument(0);
+            if ("eventOwner".equals(username)) {
+                return new org.springframework.security.core.userdetails.User(eventOwner.getUserName(), eventOwner.getPassword(), Collections.emptyList());
+            } else if ("player".equals(username)) {
+                return new org.springframework.security.core.userdetails.User(player.getUserName(), player.getPassword(), Collections.emptyList());
+            } else {
+                throw new UsernameNotFoundException("User not found");
+            }
+        });
     }
 
     @Test
@@ -68,4 +100,3 @@ public class EventRepositoryTest {
         assertEquals("Event 2", events.get(1).getName());
     }
 }
-

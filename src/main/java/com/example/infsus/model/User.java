@@ -1,6 +1,7 @@
 package com.example.infsus.model;
 
 import com.example.infsus.model.superclass.IdSuperClass;
+import com.example.infsus.requests.RegisterRequest;
 import com.example.infsus.requests.UserRequest;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -27,6 +28,8 @@ public class User extends IdSuperClass {
     private String userName;
     @Column(name = "email")
     private String email;
+    @Column(name = "password")
+    private String password;
 
     @JsonIgnore
     @OneToMany(mappedBy = "eventOwner")
@@ -43,4 +46,11 @@ public class User extends IdSuperClass {
         this.userName = userRequest.getUserName();
     }
 
+    public User(RegisterRequest registerRequest){
+        this.name = registerRequest.getName();
+        this.lastName = registerRequest.getLastName();
+        this.userName = registerRequest.getUserName();
+        this.email = registerRequest.getEmail();
+        this.password = registerRequest.getPassword();
+    }
 }

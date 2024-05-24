@@ -7,6 +7,7 @@ import com.example.infsus.model.User;
 import com.example.infsus.repository.UserRepository;
 import com.example.infsus.requests.UserRequest;
 import com.example.infsus.service.UserService;
+import com.example.infsus.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 
 public class UserServiceTest {
 
@@ -28,7 +28,7 @@ public class UserServiceTest {
     private Authentication authentication;
 
     @Mock
-    private Jwt jwtToken;
+    private JwtTokenUtil jwtTokenUtil;
 
     private UserRequest initialUserRequest;
     private UserRequest updatedUserRequest;
@@ -51,28 +51,17 @@ public class UserServiceTest {
         user = new User(initialUserRequest);
         user.setEmail("trpi@example.com");
 
-        when(jwtToken.getClaim("email")).thenReturn("trpi@example.com");
-        when(authentication.getPrincipal()).thenReturn(jwtToken);
+        String token = "dummyToken";
+        when(jwtTokenUtil.getUsernameFromToken(token)).thenReturn("Kralj");
+        when(authentication.getCredentials()).thenReturn(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    @Test
-    public void testCreateUser() {
-        when(userRepository.save(any(User.class))).thenReturn(user);
 
-        User result = userService.createUser(initialUserRequest);
-        assertNotNull(result);
-        assertEquals("Trpimir", result.getName());
-        assertEquals("Trpimirović", result.getLastName());
-        assertEquals("Kralj", result.getUserName());
-        assertEquals("trpi@example.com", result.getEmail());
-
-        verify(userRepository, times(1)).save(any(User.class));
-    }
 
     @Test
     public void testUpdateUser() {
-        when(userRepository.findByEmail(any(String.class))).thenReturn(user);
+        when(userRepository.findByUserName(any(String.class))).thenReturn(user);
 
         User result = userService.updateUser(updatedUserRequest);
         assertNotNull(result);
@@ -81,19 +70,19 @@ public class UserServiceTest {
         assertEquals("Rope", result.getUserName());
         assertEquals("trpi@example.com", result.getEmail());
 
-        verify(userRepository, times(1)).findByEmail(any(String.class));
+        verify(userRepository, times(1)).findByUserName(any(String.class));
     }
 
     @Test
     public void testUpdateUser_UserNotFound() {
-        when(userRepository.findByEmail(any(String.class))).thenReturn(null);
+        when(userRepository.findByUserName(any(String.class))).thenReturn(null);
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             userService.updateUser(updatedUserRequest);
         });
 
         assertEquals("Klijent nije pronađen", exception.getMessage());
-        verify(userRepository, times(1)).findByEmail(any(String.class));
+        verify(userRepository, times(1)).findByUserName(any(String.class));
     }
 
     @Test
@@ -107,4 +96,3 @@ public class UserServiceTest {
         assertEquals("Nedozvoljen pristup", exception.getMessage());
     }
 }
-

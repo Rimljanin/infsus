@@ -36,14 +36,14 @@ public class EventService {
     @Transactional
     public Event createEvent(EventRequest eventRequest) {
         Event event = new Event(eventRequest);
-        User user=userService.findUserByEmail();
+        User user=userService.findUserByUsername();
         event.setEventOwner(user);
         return eventRepository.save(event);
     }
 
     @Transactional
     public Event updateEvent(EventRequest eventRequest,String id) {
-        User user = userService.findUserByEmail();
+        User user = userService.findUserByUsername();
         Event event = getEventById(id);
         if (event.getEventOwner().getId().equals(user.getId())) {
             event.setName(eventRequest.getName());
@@ -62,7 +62,7 @@ public class EventService {
 
     @Transactional
     public ResponseEntity<String> joinEvent(String id) {
-        User user = userService.findUserByEmail();
+        User user = userService.findUserByUsername();
         Event event = getEventById(id);
 
         if(event.isLocked()){
@@ -84,7 +84,7 @@ public class EventService {
 
     @Transactional
     public ResponseEntity<String> lockEvent(String id) {
-        User user = userService.findUserByEmail();
+        User user = userService.findUserByUsername();
         Event event = getEventById(id);
         if (event.getEventOwner().getId().equals(user.getId())) {
             event.setLocked(true);
@@ -95,7 +95,7 @@ public class EventService {
     }
     @Transactional
     public ResponseEntity<String> unlockEvent(String id) {
-        User user = userService.findUserByEmail();
+        User user = userService.findUserByUsername();
         Event event = getEventById(id);
         if (event.getEventOwner().getId().equals(user.getId())) {
             event.setLocked(false);
@@ -107,7 +107,7 @@ public class EventService {
 
     @Transactional
     public void deleteEvent(String id) {
-        User user = userService.findUserByEmail();
+        User user = userService.findUserByUsername();
         Event event = getEventById(id);
         if (event.getEventOwner().getId().equals(user.getId())) {
             eventRepository.delete(event);
@@ -118,7 +118,7 @@ public class EventService {
 
     public Page<Event> filterEvents(String name, Location location, Sport sport, LocalDateTime startTime, Boolean myGames, Pageable pageable) {
 
-        User currentUser= userService.findUserByEmail();
+        User currentUser= userService.findUserByUsername();
 
         Specification<Event> spec = EventSpecification.getEventsByCriteria(name, location, sport, startTime, myGames, currentUser);
         return eventRepository.findAll(spec, pageable);

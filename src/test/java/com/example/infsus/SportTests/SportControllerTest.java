@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.example.infsus.controller.SportController;
 import com.example.infsus.model.Sport;
 import com.example.infsus.service.SportService;
+import com.example.infsus.util.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -15,10 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,6 +38,9 @@ public class SportControllerTest {
     @MockBean
     private SportService sportService;
 
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+
     private List<Sport> sportList;
 
     @TestConfiguration
@@ -45,9 +49,14 @@ public class SportControllerTest {
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-            http.csrf().disable()
-                    .authorizeRequests().anyRequest().permitAll();
+            http.csrf(csrf -> csrf.disable())
+                    .authorizeRequests(auth -> auth.anyRequest().permitAll());
             return http.build();
+        }
+
+        @Bean
+        public JwtTokenUtil jwtTokenUtil() {
+            return new JwtTokenUtil();
         }
     }
 

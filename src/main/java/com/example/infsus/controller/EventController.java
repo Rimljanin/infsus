@@ -38,7 +38,7 @@ public class EventController {
     }
 
 
-    @GetMapping("/public/events/user/{userId}")
+    @GetMapping("/events/user/{userId}")
     public ResponseEntity<List<Event>> getEventsByUser(@PathVariable String userId) {
         List<Event> events = eventService.findEventsByOwnerOrPlayer(userId);
         return ResponseEntity.ok(events);
