@@ -49,7 +49,7 @@ public class AuthController {
             final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
             final String jwt = jwtTokenUtil.generateToken(userDetails);
 
-            return ResponseEntity.ok(new AuthResponse(jwt));
+            return ResponseEntity.ok(new AuthResponse(jwt, authRequest.getUsername()));
         } catch (BadCredentialsException e) {
             throw new Exception("Nevažeći podatci za login");
         }
@@ -73,7 +73,7 @@ public class AuthController {
         final UserDetails userDetails = userDetailsService.loadUserByUsername(registerRequest.getUserName());
         final String jwt = jwtTokenUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(new AuthResponse(jwt));
+        return ResponseEntity.ok(new AuthResponse(jwt, user.getUserName()));
     }
 
     @GetMapping("/validate-token/public")
