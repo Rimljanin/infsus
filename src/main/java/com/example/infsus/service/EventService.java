@@ -4,6 +4,8 @@ import com.example.infsus.helpers.EventSpecification;
 import com.example.infsus.model.*;
 import com.example.infsus.repository.EventPlayerRepository;
 import com.example.infsus.repository.EventRepository;
+import com.example.infsus.repository.LocationRepository;
+import com.example.infsus.repository.SportRepository;
 import com.example.infsus.requests.EventRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,12 +18,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EventService {
 
     @Autowired
     private EventRepository eventRepository;
+
+    @Autowired
+    private LocationRepository locationRepository;
+
+    @Autowired
+    private SportRepository sportRepository;
 
     @Autowired
     private UserService userService;
@@ -35,25 +44,38 @@ public class EventService {
 
     @Transactional
     public Event createEvent(EventRequest eventRequest) {
-        Event event = new Event(eventRequest);
-        User user=userService.findUserByUsername();
-        event.setEventOwner(user);
+        User user = userService.findUserByUsername();
+        Optional<Location> location = locationRepository.findById(eventRequest.getLocationId());
+        Optional<Sport> sport = sportRepository.findById(eventRequest.getSportId());
+
+        Event event = new Event(
+                eventRequest.getName(),
+                user,
+                eventRequest.getMaxPeople(),
+                eventRequest.getCurrentPeople(),
+                location.get(),
+                eventRequest.getStartTime(),
+                eventRequest.isLocked(),
+                sport.get()
+        );
+
         return eventRepository.save(event);
     }
 
     @Transactional
     public Event updateEvent(EventRequest eventRequest,String id) {
         User user = userService.findUserByUsername();
+        Optional<Location> location = locationRepository.findById(eventRequest.getLocationId());
+        Optional<Sport> sport = sportRepository.findById(eventRequest.getSportId());
         Event event = getEventById(id);
         if (event.getEventOwner().getId().equals(user.getId())) {
             event.setName(eventRequest.getName());
-            event.setLocation(eventRequest.getLocation());
+            event.setLocation(location.get());
             event.setLocked(eventRequest.isLocked());
-            event.setSport(eventRequest.getSport());
+            event.setSport(sport.get());
             event.setCurrentPeople(eventRequest.getCurrentPeople());
             event.setMaxPeople(eventRequest.getMaxPeople());
             event.setStartTime(eventRequest.getStartTime());
-            event.setSport(eventRequest.getSport());
 
             return eventRepository.save(event);
         }

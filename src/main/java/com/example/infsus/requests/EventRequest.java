@@ -1,10 +1,5 @@
 package com.example.infsus.requests;
 
-import com.example.infsus.model.Location;
-import com.example.infsus.model.Sport;
-import com.example.infsus.model.User;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -14,8 +9,8 @@ public class EventRequest {
     private String name;
     private int maxPeople;
     private int currentPeople;
-    private Location location;
+    private String locationId;
     private LocalDateTime startTime;
     private boolean locked;
-    private Sport sport;
+    private String sportId;
 }
