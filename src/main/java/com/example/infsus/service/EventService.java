@@ -138,9 +138,19 @@ public class EventService {
         }
     }
 
-    public Page<Event> filterEvents(String name, Location location, Sport sport, LocalDateTime startTime, Boolean myGames, Pageable pageable) {
+    public Page<Event> filterEvents(String name, String locationId, String sportId, LocalDateTime startTime, Boolean myGames, Pageable pageable) {
 
         User currentUser= userService.findUserByUsername();
+
+        Location location=null;
+        Sport sport=null;
+        if(locationId!=null){
+            location=locationRepository.findById(locationId).get();
+        }
+        if(sportId!=null){
+            sport=sportRepository.findById(sportId).get();
+        }
+
 
         Specification<Event> spec = EventSpecification.getEventsByCriteria(name, location, sport, startTime, myGames, currentUser);
         return eventRepository.findAll(spec, pageable);

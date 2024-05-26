@@ -28,8 +28,8 @@ public class EventController {
     @GetMapping("filter")
     public Page<Event> getEvents(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) Location location,
-            @RequestParam(required = false) Sport sport,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String sport,
             @RequestParam(required = false) LocalDateTime startTime,
             @RequestParam(required = false) Boolean myGames,
             @PageableDefault(size = 20) Pageable pageable) {
