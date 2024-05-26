@@ -150,5 +150,9 @@ public class EventService {
         return eventRepository.findByEventOwner_IdOrPlayersViaApp_Id(userId, userId);
     }
 
+    public Event findEventById(String id) {
+        return eventRepository.findById(id).orElse(null);
+    }
+
 
 }

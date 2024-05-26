@@ -74,4 +74,10 @@ public class EventController {
         eventService.deleteEvent(id);
     }
 
+    @GetMapping("/event/{id}")
+    public ResponseEntity<Event> getEventById(@PathVariable String id) {
+        Event event = eventService.findEventById(id);
+        return ResponseEntity.ok(event);
+    }
+
 }
